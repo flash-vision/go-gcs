@@ -70,7 +70,6 @@ func (g *gcpStorageClient) GetObjectIterator(ctx context.Context, bucketName, ob
 }
 
 // SignedURL returns a signed URL for accessing the specified object in the specified bucket
-// SignedURL returns a signed URL for accessing the specified object in the specified bucket
 func (g *gcpStorageClient) SignURL(bucketName string, objectName string, expiration time.Duration) (string, error) {
 	opts := &storage.SignedURLOptions{
 		Method:  "GET", // Specify the HTTP method here
