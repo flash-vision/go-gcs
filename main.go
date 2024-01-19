@@ -15,7 +15,7 @@ func GenerateUUID4() string {
 	return uuid.New().String()
 }
 
-func getCloudObjectKey(url_path string) string {
+func GetCloudObjectKey(url_path string) string {
 	parsedurl, err := url.Parse(url_path)
 	if err != nil {
 		fmt.Printf("Error parsing url: %v", err)
@@ -25,7 +25,7 @@ func getCloudObjectKey(url_path string) string {
 	return strings.TrimPrefix(parsedurl.Path, "/")
 }
 
-func getCloudBucketFromUri(uri string) (bucket string, err error) {
+func GetCloudBucketFromUri(uri string) (bucket string, err error) {
 
 	url, err := url.Parse(uri)
 	if err != nil {
@@ -46,7 +46,7 @@ type GCPStorageClient interface {
 	// GetObjectIterator returns an iterator for listing objects in the specified bucket with the given prefix
 	GetObjectIterator(ctx context.Context, bucketName, objectName string) *storage.ObjectIterator
 	// SignedURL returns a signed URL for accessing the specified object in the specified bucket
-	SignedURL(bucketName string, objectName string, expiration time.Duration) (string, error)
+	SignURL(bucketName string, objectName string, expiration time.Duration) (string, error)
 }
 
 // gcpStorageClient is the implementation of the GCPStorageClient interface
@@ -71,24 +71,22 @@ func (g *gcpStorageClient) GetObjectIterator(ctx context.Context, bucketName, ob
 
 // SignedURL returns a signed URL for accessing the specified object in the specified bucket
 // SignedURL returns a signed URL for accessing the specified object in the specified bucket
-func (g *gcpStorageClient) SignedURL(bucketName string, objectName string, expiration time.Duration) (string, error) {
+func (g *gcpStorageClient) SignURL(bucketName string, objectName string, expiration time.Duration) (string, error) {
 	opts := &storage.SignedURLOptions{
 		Method:  "GET", // Specify the HTTP method here
 		Expires: time.Now().Add(expiration),
 	}
 	return g.client.Bucket(bucketName).SignedURL(objectName, opts)
 }
-
-// materialize a function for signed url
 // SignedURL returns a signed URL for accessing the specified object in the specified bucket
-func SignedURL(ctx context.Context, bucketName string, objectName string, expiration time.Duration) (string, error) {
+func SignURL(ctx context.Context, bucketName string, objectName string, expiration time.Duration) (string, error) {
 	// create a new GCPStorageClient
 	gcpStorageClient, err := NewGCPStorageClient(ctx, "")
 	if err != nil {
 
 		return "", err
 	}
-	return gcpStorageClient.SignedURL(bucketName, objectName, expiration)
+	return gcpStorageClient.SignURL(bucketName, objectName, expiration)
 }
 
 // NewGCPStorageClient creates a new instance of the GCPStorageClient interface
